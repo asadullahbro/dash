@@ -20,7 +20,6 @@ export default function LoginPage() {
     }
   }, [checking, isLoggedIn, navigate]);
 
-  // Intentional loading state
   if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -48,11 +47,15 @@ export default function LoginPage() {
           onClick={loginAsGuest}
           className="w-full py-2.5 border border-stone-200 text-stone-600 rounded-md font-medium hover:bg-stone-50 transition mb-4"
         >
-          Continue as Guest
+          Try without account
         </button>
 
+        <p className="text-xs text-stone-300 mb-2">
+          no pressure. just reflection.
+        </p>
+
         <p className="text-xs text-stone-300">
-          no ads • no streak pressure • just reflection
+          add habits → check in daily → reflect later
         </p>
       </div>
     </div>
