@@ -29,6 +29,15 @@ const useAuthStore = create((set) => ({
     if (error) console.error(error);
   },
 
+  // Google ID token from Google Identity Services; the auth listener below picks up the session.
+  loginWithGoogleToken: async (credential) => {
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: credential,
+    });
+    if (error) console.error(error);
+  },
+
   loginAsGuest: () => {
     set({
       user: { name: 'Guest', email: '', picture: '' },

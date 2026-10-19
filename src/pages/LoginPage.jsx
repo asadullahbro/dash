@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import useAuthStore from '../store/authStore';
 
 export default function LoginPage() {
   const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const loginWithGoogleToken = useAuthStore((s) => s.loginWithGoogleToken);
   const loginAsGuest = useAuthStore((s) => s.loginAsGuest);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const navigate = useNavigate();
@@ -37,12 +39,24 @@ export default function LoginPage() {
           no streak pressure, just habits
         </p>
 
-        <button
-          onClick={loginWithGoogle}
-          className="w-full py-2.5 bg-black text-white rounded-md font-medium hover:bg-gray-800 transition mb-3"
-        >
-          Sign in with Google
-        </button>
+        {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+          <div className="flex justify-center mb-3">
+            <GoogleLogin
+              onSuccess={(res) => loginWithGoogleToken(res.credential)}
+              onError={() => console.error('Google sign-in failed')}
+              theme="filled_black"
+              shape="rectangular"
+              width="320"
+            />
+          </div>
+        ) : (
+          <button
+            onClick={loginWithGoogle}
+            className="w-full py-2.5 bg-black text-white rounded-md font-medium hover:bg-gray-800 transition mb-3"
+          >
+            Sign in with Google
+          </button>
+        )}
 
         <button
           onClick={loginAsGuest}
