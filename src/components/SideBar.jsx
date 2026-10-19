@@ -2,7 +2,10 @@ export default function Sidebar({ user, onLogout, onClose }) {
   return (
     <div className="h-full flex flex-col p-4">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-bold text-white">dash</h2>
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.svg" alt="" className="w-7 h-7 rounded-md ring-1 ring-white/20" />
+          <h2 className="text-xl font-bold text-white">dash</h2>
+        </div>
         {onClose && (
           <button onClick={onClose} className="text-zinc-400">✕</button>
         )}
