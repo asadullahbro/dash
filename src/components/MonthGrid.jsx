@@ -15,10 +15,10 @@ export default function MonthGrid() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const today = new Date();
-  const monthStart = startOfMonth(today);
-  const monthEnd = endOfMonth(today);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const days = useMemo(() => {
+    const today = new Date();
+    return eachDayOfInterval({ start: startOfMonth(today), end: endOfMonth(today) });
+  }, []);
 
   // Gather per‑day activity types (yes / no / skip)
   const dayActivity = useMemo(() => {
@@ -51,7 +51,7 @@ export default function MonthGrid() {
         onClick={() => setExpanded(!expanded)}
         className="text-xs text-stone-400 hover:text-stone-600 transition"
       >
-        {format(today, 'MMMM yyyy')} {expanded ? '▾' : '▸'}
+        {format(days[0], 'MMMM yyyy')} {expanded ? '▾' : '▸'}
       </button>
 
       {expanded && (

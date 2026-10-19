@@ -2,7 +2,23 @@ import { create } from 'zustand';
 import { storageAdapter } from '../storage/adapter';
 import useAuthStore from './authStore';
 
-const useEntryStore = create((set, get) => ({
+async function logEvent(set, habitId, fields) {
+  const event = {
+    habit_id: habitId,
+    reason: '',
+    timestamp: new Date().toISOString(),
+    ...fields,
+  };
+  try {
+    const saved = await storageAdapter.addEvent(event);
+    set((state) => ({ entries: [...state.entries, saved] }));
+    return saved.id; // for reason prompt
+  } catch (err) {
+    console.error('Failed to log entry', err);
+  }
+}
+
+const useEntryStore = create((set) => ({
   // ----- State -----
   habits: [],     // [{ id, name, type }]
   entries: [],    // [{ id, habit_id, value, skipped, reason, timestamp }]
@@ -49,64 +65,11 @@ load: async () => {
     }
   },
 
-  // ----- Log actions (now using habit_id) -----
-  logYes: async (habitId) => {
-    const event = {
-      habit_id: habitId,
-      value: true,
-      skipped: false,
-      reason: '',
-      timestamp: new Date().toISOString(),
-    };
-    try {
-      await storageAdapter.addEvent(event);
-      // Fetch the latest event id? Not needed, we can just push a temp entry (or re-fetch)
-      // For immediate UI, push a temp object with a generated id
-      set((state) => ({
-        entries: [...state.entries, { ...event, id: crypto.randomUUID() }],
-      }));
-    } catch (err) {
-      console.error('Failed to log yes', err);
-    }
-  },
-
-  logNo: async (habitId) => {
-    const tempId = crypto.randomUUID();
-    const event = {
-      habit_id: habitId,
-      value: false,
-      skipped: false,
-      reason: '',
-      timestamp: new Date().toISOString(),
-    };
-    try {
-      await storageAdapter.addEvent(event);
-      set((state) => ({
-        entries: [...state.entries, { ...event, id: tempId }],
-      }));
-      return tempId; // for reason prompt
-    } catch (err) {
-      console.error('Failed to log no', err);
-    }
-  },
-
-  skipHabit: async (habitId) => {
-    const event = {
-      habit_id: habitId,
-      value: null,
-      skipped: true,
-      reason: '',
-      timestamp: new Date().toISOString(),
-    };
-    try {
-      await storageAdapter.addEvent(event);
-      set((state) => ({
-        entries: [...state.entries, { ...event, id: crypto.randomUUID() }],
-      }));
-    } catch (err) {
-      console.error('Failed to skip habit', err);
-    }
-  },
+  // ----- Log actions -----
+  // Stores the row the adapter saved, so its id matches the database.
+  logYes: (habitId) => logEvent(set, habitId, { value: true, skipped: false }),
+  logNo: (habitId) => logEvent(set, habitId, { value: false, skipped: false }),
+  skipHabit: (habitId) => logEvent(set, habitId, { value: null, skipped: true }),
 
   updateEntryReason: async (entryId, reason) => {
     try {

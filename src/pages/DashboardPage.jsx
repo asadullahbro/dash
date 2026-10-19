@@ -3,7 +3,6 @@ import useAuthStore from '../store/authStore';
 import useEntryStore from '../store/entryStore';
 import { parseISO, isToday, startOfDay, differenceInCalendarDays } from 'date-fns';
 import MonthGrid from '../components/MonthGrid';
-import { useNavigate } from 'react-router-dom';
 
 // ----- Helpers (updated to use habit_id) -----
 function getDailyState(entries, habitId) {
@@ -141,7 +140,6 @@ export default function DashboardPage() {
   const skipHabit = useEntryStore((s) => s.skipHabit);
   const updateEntryReason = useEntryStore((s) => s.updateEntryReason);
   const isGuest = useAuthStore((s) => s.isGuest);
-  const navigate = useNavigate();
 
   const [newHabit, setNewHabit] = useState('');
   const [habitType, setHabitType] = useState('build');
@@ -197,10 +195,10 @@ export default function DashboardPage() {
 
   const handleNo = useCallback(
     async (id) => {
-      const entryId = await logNo(id); // returns temp id of saved event
+      const entryId = await logNo(id); // id of the saved entry
       // Show prompt – need habit name for display
       const habit = habits.find((h) => h.id === id);
-      if (habit) {
+      if (habit && entryId) {
         clearTimeout(promptTimer.current);
         setPrompt({ habitName: habit.name, entryId });
         promptTimer.current = setTimeout(() => setPrompt(null), 7000);

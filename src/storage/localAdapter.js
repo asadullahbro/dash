@@ -1,4 +1,4 @@
-import { get, set, del } from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 
 const HABITS_KEY = 'habits_local';
 const EVENTS_KEY = 'events_local';
@@ -18,15 +18,18 @@ export const localAdapter = {
     const habits = await this.getHabits();
     const updated = habits.filter(h => h.id !== id);
     await set(HABITS_KEY, updated);
-    // also remove related events (optional, keep for now)
+    const events = await this.getEvents();
+    await set(EVENTS_KEY, events.filter(e => e.habit_id !== id));
   },
   async getEvents() {
     return (await get(EVENTS_KEY)) || [];
   },
   async addEvent(event) {
     const events = await this.getEvents();
-    events.push({ ...event, id: crypto.randomUUID() });
+    const saved = { ...event, id: crypto.randomUUID() };
+    events.push(saved);
     await set(EVENTS_KEY, events);
+    return saved;
   },
   async updateEntryReason(entryId, reason) {
     const events = await this.getEvents();

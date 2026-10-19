@@ -32,8 +32,9 @@ export const storageAdapter = {
   },
   async addEvent(event) {
     if (isGuest()) return localAdapter.addEvent(event);
-    const { error } = await supabase.from('entries').insert(event);
+    const { data, error } = await supabase.from('entries').insert(event).select().single();
     if (error) throw error;
+    return data;
   },
   async updateEntryReason(entryId, reason) {
     if (isGuest()) return localAdapter.updateEntryReason(entryId, reason);
