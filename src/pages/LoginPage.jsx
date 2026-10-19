@@ -31,6 +31,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-xs text-center">
+        <img src="/logo.svg" alt="" className="w-12 h-12 mx-auto mb-4" />
         <h1 className="text-3xl font-light mb-2 tracking-tight">dash</h1>
         <p className="text-sm text-stone-500 mb-8">
           no streak pressure, just habits
